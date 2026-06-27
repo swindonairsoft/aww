@@ -1,0 +1,1802 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Airsoft World Wide</title>
+<style>
+:root {
+  --green: #22c55e;
+  --green-dark: #16a34a;
+  --green-darker: #15803d;
+  --green-light: #86efac;
+  --green-bg: #f0fdf4;
+  --green-dim: #dcfce7;
+  --bg: #0a0f0d;
+  --bg2: #111814;
+  --bg3: #182019;
+  --bg4: #1f2a20;
+  --surface: #1a2420;
+  --surface2: #223028;
+  --border: rgba(34,197,94,0.15);
+  --border2: rgba(34,197,94,0.25);
+  --text: #e8f5ea;
+  --text2: #9db89e;
+  --text3: #6b8c6c;
+  --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  --mono: 'Courier New', monospace;
+  --r: 8px;
+  --r2: 12px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--text); font-family: var(--font); font-size: 15px; line-height: 1.6; min-height: 100vh; }
+a { color: var(--green); text-decoration: none; }
+a:hover { color: var(--green-light); }
+img { max-width: 100%; }
+button { cursor: pointer; font-family: var(--font); }
+input, textarea, select { font-family: var(--font); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: var(--bg2); }
+::-webkit-scrollbar-thumb { background: var(--green-darker); border-radius: 3px; }
+
+/* ---- NAV ---- */
+#navbar {
+  position: sticky; top: 0; z-index: 100;
+  background: rgba(10,15,13,0.95);
+  border-bottom: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  padding: 0 24px;
+  display: flex; align-items: center; justify-content: space-between;
+  height: 56px;
+}
+.nav-logo {
+  display: flex; align-items: center; gap: 10px;
+  font-size: 18px; font-weight: 700; color: var(--text);
+  letter-spacing: -0.3px;
+}
+.nav-logo .logo-icon {
+  width: 32px; height: 32px; background: var(--green); border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px; font-weight: 900; color: #000;
+}
+.nav-links { display: flex; align-items: center; gap: 4px; }
+.nav-link {
+  padding: 6px 12px; border-radius: var(--r); font-size: 14px; font-weight: 500;
+  color: var(--text2); border: none; background: none; transition: all 0.15s;
+}
+.nav-link:hover, .nav-link.active { background: var(--bg4); color: var(--green); }
+.nav-right { display: flex; align-items: center; gap: 8px; }
+.btn { padding: 7px 16px; border-radius: var(--r); font-size: 14px; font-weight: 500; border: none; transition: all 0.15s; }
+.btn-ghost { background: var(--bg4); color: var(--text); }
+.btn-ghost:hover { background: var(--surface2); }
+.btn-green { background: var(--green); color: #000; font-weight: 600; }
+.btn-green:hover { background: var(--green-dark); }
+.btn-outline { background: none; border: 1px solid var(--border2); color: var(--green); }
+.btn-outline:hover { background: var(--bg4); }
+.btn-red { background: #ef4444; color: #fff; }
+.btn-red:hover { background: #dc2626; }
+.btn-sm { padding: 4px 10px; font-size: 13px; }
+
+/* ---- LAYOUT ---- */
+#app { display: flex; min-height: calc(100vh - 56px); }
+#sidebar-left {
+  width: 220px; flex-shrink: 0;
+  position: sticky; top: 56px; height: calc(100vh - 56px);
+  overflow-y: auto; padding: 16px 12px;
+  border-right: 1px solid var(--border);
+  background: var(--bg2);
+}
+#main { flex: 1; min-width: 0; }
+#sidebar-right {
+  width: 280px; flex-shrink: 0;
+  position: sticky; top: 56px; height: calc(100vh - 56px);
+  overflow-y: auto; padding: 16px;
+  border-left: 1px solid var(--border);
+  background: var(--bg2);
+}
+
+/* ---- SIDEBAR NAV ---- */
+.sidebar-section { margin-bottom: 24px; }
+.sidebar-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.8px; padding: 0 8px; margin-bottom: 6px; }
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px; border-radius: var(--r); font-size: 14px; color: var(--text2);
+  border: none; background: none; width: 100%; text-align: left; cursor: pointer;
+  transition: all 0.15s;
+}
+.sidebar-item:hover, .sidebar-item.active { background: var(--bg4); color: var(--green); }
+.sidebar-icon { font-size: 16px; width: 20px; text-align: center; }
+
+/* ---- VIEWS ---- */
+.view { display: none; }
+.view.active { display: block; }
+
+/* ---- FEED ---- */
+#view-feed { padding: 20px; max-width: 680px; margin: 0 auto; }
+.compose-box {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 16px; margin-bottom: 20px;
+}
+.compose-box textarea {
+  width: 100%; background: none; border: none; color: var(--text); resize: none;
+  font-size: 15px; line-height: 1.6; outline: none; min-height: 80px;
+}
+.compose-box textarea::placeholder { color: var(--text3); }
+.compose-actions { display: flex; align-items: center; justify-content: space-between; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+/* Post card */
+.post-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  margin-bottom: 12px; overflow: hidden;
+}
+.post-card.pinned { border-color: var(--green-darker); }
+.post-pin-bar { background: var(--green-darker); padding: 5px 16px; font-size: 12px; color: #000; font-weight: 600; }
+.post-header { display: flex; align-items: center; gap: 10px; padding: 14px 16px 0; }
+.avatar {
+  width: 38px; height: 38px; border-radius: 50%; background: var(--bg4);
+  display: flex; align-items: center; justify-content: center; font-weight: 700;
+  font-size: 14px; color: var(--green); flex-shrink: 0; overflow: hidden;
+  border: 1px solid var(--border2);
+}
+.avatar img { width: 100%; height: 100%; object-fit: cover; }
+.post-meta { flex: 1; }
+.post-author { font-weight: 600; font-size: 14px; color: var(--text); }
+.post-time { font-size: 12px; color: var(--text3); }
+.post-badge { font-size: 11px; background: var(--green-darker); color: #000; padding: 1px 6px; border-radius: 4px; font-weight: 600; margin-left: 6px; }
+.post-body { padding: 10px 16px 12px; font-size: 15px; color: var(--text); line-height: 1.65; white-space: pre-wrap; }
+.post-image { width: 100%; max-height: 400px; object-fit: cover; }
+.post-reactions {
+  padding: 8px 16px; border-top: 1px solid var(--border);
+  display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+}
+.reaction-btn {
+  display: flex; align-items: center; gap: 5px; padding: 4px 10px;
+  border-radius: 20px; border: 1px solid var(--border); background: none;
+  color: var(--text2); font-size: 13px; cursor: pointer; transition: all 0.15s;
+}
+.reaction-btn:hover { border-color: var(--border2); background: var(--bg4); }
+.reaction-btn.reacted { background: var(--bg4); border-color: var(--green-darker); color: var(--green); }
+.comment-section { padding: 0 16px 12px; }
+.comment-input-row { display: flex; gap: 8px; align-items: flex-start; margin-top: 8px; }
+.comment-input-row textarea {
+  flex: 1; background: var(--bg4); border: 1px solid var(--border); color: var(--text);
+  border-radius: var(--r); padding: 8px 12px; font-size: 14px; resize: none;
+  outline: none; min-height: 40px;
+}
+.comment { display: flex; gap: 8px; margin-bottom: 8px; }
+.comment .avatar { width: 28px; height: 28px; font-size: 11px; }
+.comment-content { background: var(--bg4); border-radius: var(--r); padding: 8px 12px; flex: 1; }
+.comment-content .post-author { font-size: 13px; }
+.comment-content p { font-size: 14px; color: var(--text); margin-top: 2px; }
+
+/* ---- GAME DAYS ---- */
+.gameday-card {
+  display: flex; align-items: center; gap: 14px;
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 14px 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s;
+}
+.gameday-card:hover { border-color: var(--border2); background: var(--bg4); }
+.gameday-date {
+  text-align: center; min-width: 52px;
+  background: var(--bg4); border-radius: var(--r); padding: 8px;
+  border: 1px solid var(--border);
+}
+.gameday-day { font-size: 20px; font-weight: 700; color: var(--green); line-height: 1; }
+.gameday-month { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; }
+.gameday-dow { font-size: 11px; color: var(--text2); }
+.gameday-info { flex: 1; }
+.gameday-site { font-weight: 600; font-size: 15px; color: var(--text); }
+.gameday-loc { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.gameday-players { display: flex; gap: 4px; align-items: center; }
+.player-bubble { width: 28px; height: 28px; border-radius: 50%; background: var(--bg4); border: 2px solid var(--bg2); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: var(--green); }
+.upcoming-badge { font-size: 11px; background: var(--bg4); color: var(--text2); padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); white-space: nowrap; }
+
+/* ---- EVENTS ---- */
+.event-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 16px; margin-bottom: 12px;
+}
+.event-title { font-size: 16px; font-weight: 700; color: var(--green); margin-bottom: 6px; }
+.event-loc { font-size: 13px; color: var(--text3); margin-bottom: 8px; }
+.event-desc { font-size: 14px; color: var(--text2); line-height: 1.6; }
+.event-footer { display: flex; align-items: center; gap: 8px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--border); }
+
+/* ---- PEOPLE ---- */
+.people-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; padding: 20px; }
+.player-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 16px; text-align: center; transition: all 0.15s; cursor: pointer;
+}
+.player-card:hover { border-color: var(--border2); background: var(--bg4); }
+.player-card .avatar { width: 60px; height: 60px; font-size: 22px; margin: 0 auto 10px; }
+.player-callsign { font-weight: 700; font-size: 15px; color: var(--text); }
+.player-loc { font-size: 13px; color: var(--text3); margin-top: 2px; }
+.player-stats { display: flex; justify-content: center; gap: 16px; margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--border); }
+.player-stat-val { font-size: 16px; font-weight: 700; color: var(--green); display: block; }
+.player-stat-lbl { font-size: 11px; color: var(--text3); }
+
+/* ---- PROFILE ---- */
+#view-profile { padding: 0; }
+.profile-banner {
+  height: 180px; background: linear-gradient(135deg, #0f2d16 0%, #1a4a2a 50%, #0a1f10 100%);
+  position: relative; border-bottom: 1px solid var(--border);
+}
+.profile-banner-pattern {
+  position: absolute; inset: 0; opacity: 0.1;
+  background-image: repeating-linear-gradient(45deg, var(--green) 0, var(--green) 1px, transparent 0, transparent 50%);
+  background-size: 16px 16px;
+}
+.profile-info { padding: 0 24px 20px; }
+.profile-avatar-wrap { position: relative; margin-top: -44px; margin-bottom: 12px; display: inline-block; }
+.profile-avatar { width: 88px; height: 88px; border-radius: 50%; border: 4px solid var(--bg); background: var(--bg4); display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 700; color: var(--green); }
+.profile-callsign { font-size: 22px; font-weight: 700; color: var(--text); }
+.profile-bio { color: var(--text2); font-size: 15px; margin-top: 4px; }
+.profile-meta { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; }
+.profile-meta-item { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--text3); }
+.profile-tabs { display: flex; border-bottom: 1px solid var(--border); margin: 0 24px; gap: 4px; }
+.profile-tab { padding: 10px 16px; font-size: 14px; font-weight: 500; color: var(--text2); border: none; background: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.15s; }
+.profile-tab.active { color: var(--green); border-bottom-color: var(--green); }
+.profile-content { padding: 20px 24px; }
+
+/* ---- MAP ---- */
+#view-map { height: calc(100vh - 56px); }
+.map-placeholder {
+  height: 100%; background: var(--bg2); display: flex; align-items: center; justify-content: center;
+  flex-direction: column; gap: 16px;
+}
+.map-icon { font-size: 64px; opacity: 0.3; }
+
+/* ---- LOCATIONS ---- */
+.location-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  overflow: hidden; cursor: pointer; transition: all 0.15s;
+}
+.location-card:hover { border-color: var(--border2); }
+.location-banner { height: 100px; background: linear-gradient(135deg, #0d2a14, #1e4a24); display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.location-body { padding: 14px; }
+.location-name { font-weight: 700; font-size: 15px; color: var(--text); }
+.location-type { font-size: 12px; color: var(--green); margin-top: 2px; }
+.location-loc { font-size: 13px; color: var(--text3); margin-top: 4px; }
+.location-tags { display: flex; gap: 4px; flex-wrap: wrap; margin-top: 8px; }
+.tag { font-size: 11px; background: var(--bg4); color: var(--text2); padding: 2px 8px; border-radius: 20px; border: 1px solid var(--border); }
+
+/* ---- STATS WIDGET ---- */
+.stats-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2); padding: 16px; margin-bottom: 12px; }
+.stats-title { font-size: 13px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 12px; }
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.stat-box { text-align: center; }
+.stat-num { font-size: 22px; font-weight: 700; color: var(--green); }
+.stat-lbl { font-size: 11px; color: var(--text3); margin-top: 1px; }
+
+/* ---- ACTIVITY ---- */
+.activity-item {
+  display: flex; align-items: flex-start; gap: 10px;
+  padding: 10px 0; border-bottom: 1px solid var(--border); font-size: 13px; color: var(--text2);
+}
+.activity-item .avatar { width: 30px; height: 30px; font-size: 12px; flex-shrink: 0; }
+.activity-text { flex: 1; line-height: 1.5; }
+.activity-time { font-size: 11px; color: var(--text3); white-space: nowrap; }
+
+/* ---- LOADOUT ---- */
+.loadout-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 14px; margin-bottom: 10px;
+}
+.loadout-name { font-weight: 600; color: var(--text); margin-bottom: 8px; }
+.loadout-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.loadout-item { font-size: 12px; background: var(--bg4); color: var(--text2); padding: 3px 10px; border-radius: 20px; border: 1px solid var(--border); }
+
+/* ---- RADIO CHECK ---- */
+.radio-card {
+  background: var(--surface); border: 1px solid var(--green-darker); border-radius: var(--r2);
+  padding: 16px; margin-bottom: 10px; cursor: pointer; transition: all 0.15s;
+}
+.radio-card:hover { background: var(--bg4); }
+.radio-status { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: var(--green); margin-right: 8px; animation: pulse 2s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.4; } }
+
+/* ---- MODAL ---- */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.7); z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 20px;
+  backdrop-filter: blur(4px);
+}
+.modal-overlay.hidden { display: none; }
+.modal {
+  background: var(--bg2); border: 1px solid var(--border2); border-radius: 16px;
+  width: 100%; max-width: 520px; max-height: 90vh; overflow-y: auto;
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 18px 20px 0; }
+.modal-title { font-size: 17px; font-weight: 700; color: var(--text); }
+.modal-close { background: none; border: none; color: var(--text3); font-size: 22px; cursor: pointer; line-height: 1; }
+.modal-body { padding: 18px 20px 20px; }
+.form-group { margin-bottom: 14px; }
+.form-label { display: block; font-size: 13px; font-weight: 500; color: var(--text2); margin-bottom: 5px; }
+.form-input, .form-select, .form-textarea {
+  width: 100%; background: var(--bg4); border: 1px solid var(--border); border-radius: var(--r);
+  color: var(--text); padding: 9px 12px; font-size: 14px; outline: none; transition: border 0.15s;
+}
+.form-input:focus, .form-select:focus, .form-textarea:focus { border-color: var(--green-darker); }
+.form-textarea { resize: vertical; min-height: 80px; }
+.form-select option { background: var(--bg2); }
+
+/* ---- ADMIN ---- */
+#view-admin { padding: 24px; }
+.admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 12px; margin-bottom: 24px; }
+.admin-stat {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 16px;
+}
+.admin-stat-val { font-size: 28px; font-weight: 700; color: var(--green); }
+.admin-stat-lbl { font-size: 13px; color: var(--text3); margin-top: 4px; }
+.admin-stat-change { font-size: 12px; color: #4ade80; margin-top: 4px; }
+.admin-section { margin-bottom: 28px; }
+.admin-section-title {
+  font-size: 15px; font-weight: 600; color: var(--text); margin-bottom: 14px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+}
+.admin-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.admin-table th { text-align: left; padding: 8px 12px; font-size: 12px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; background: var(--bg4); }
+.admin-table td { padding: 10px 12px; border-bottom: 1px solid var(--border); color: var(--text2); }
+.admin-table tr:hover td { background: var(--bg4); }
+.admin-table .user-cell { display: flex; align-items: center; gap: 8px; }
+.status-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+.status-dot.green { background: var(--green); }
+.status-dot.yellow { background: #eab308; }
+.status-dot.gray { background: var(--text3); }
+.admin-action-btn { background: none; border: 1px solid var(--border); color: var(--text2); padding: 3px 10px; border-radius: var(--r); font-size: 12px; cursor: pointer; transition: all 0.15s; }
+.admin-action-btn:hover { border-color: var(--green-darker); color: var(--green); }
+.admin-action-btn.danger:hover { border-color: #ef4444; color: #ef4444; }
+.admin-tabs { display: flex; gap: 4px; margin-bottom: 20px; flex-wrap: wrap; }
+.admin-tab { padding: 7px 14px; border-radius: var(--r); font-size: 13px; font-weight: 500; background: var(--bg4); border: 1px solid var(--border); color: var(--text2); cursor: pointer; transition: all 0.15s; }
+.admin-tab.active { background: var(--green); color: #000; border-color: var(--green); }
+.admin-sub-view { display: none; }
+.admin-sub-view.active { display: block; }
+
+/* ---- NOTIFICATION ---- */
+.notif-bar {
+  position: fixed; top: 70px; right: 20px; z-index: 300;
+  background: var(--green); color: #000; padding: 12px 20px;
+  border-radius: var(--r); font-size: 14px; font-weight: 500;
+  transform: translateX(120%); transition: transform 0.3s;
+}
+.notif-bar.show { transform: translateX(0); }
+
+/* ---- FEATURE REQUESTS ---- */
+.feature-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: var(--r2);
+  padding: 14px 16px; margin-bottom: 10px; display: flex; align-items: center; gap: 14px;
+}
+.feature-vote { text-align: center; }
+.vote-btn { background: var(--bg4); border: 1px solid var(--border); border-radius: var(--r); padding: 4px 10px; color: var(--text2); cursor: pointer; font-size: 13px; transition: all 0.15s; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.vote-btn.voted { background: var(--green-darker); border-color: var(--green-darker); color: #000; }
+.vote-count { font-size: 16px; font-weight: 700; color: var(--green); }
+.feature-info { flex: 1; }
+.feature-title { font-weight: 600; color: var(--text); font-size: 15px; }
+.feature-sub { font-size: 13px; color: var(--text2); margin-top: 2px; }
+.feature-status { font-size: 11px; padding: 2px 8px; border-radius: 20px; }
+.feature-status.planned { background: var(--bg4); color: var(--text2); border: 1px solid var(--border); }
+.feature-status.in-progress { background: rgba(34,197,94,0.15); color: var(--green); border: 1px solid var(--green-darker); }
+.feature-status.done { background: rgba(34,197,94,0.3); color: var(--green-light); border: 1px solid var(--green); }
+
+/* ---- AUTH ---- */
+#view-auth { padding: 40px 20px; display: flex; align-items: center; justify-content: center; min-height: calc(100vh - 56px); }
+.auth-card {
+  background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+  padding: 32px; width: 100%; max-width: 400px;
+}
+.auth-logo { text-align: center; margin-bottom: 24px; }
+.auth-logo .logo-icon { width: 52px; height: 52px; background: var(--green); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; font-weight: 900; color: #000; margin: 0 auto 10px; }
+.auth-logo h1 { font-size: 22px; font-weight: 700; }
+.auth-logo p { color: var(--text3); font-size: 14px; margin-top: 4px; }
+.auth-divider { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+.auth-divider span { font-size: 12px; color: var(--text3); white-space: nowrap; }
+.auth-divider::before, .auth-divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+.auth-tabs { display: flex; background: var(--bg4); border-radius: var(--r); padding: 3px; margin-bottom: 20px; }
+.auth-tab { flex: 1; padding: 7px; text-align: center; font-size: 14px; font-weight: 500; border-radius: 6px; cursor: pointer; border: none; background: none; color: var(--text2); transition: all 0.15s; }
+.auth-tab.active { background: var(--surface2); color: var(--green); }
+
+/* ---- SEARCH ---- */
+.search-bar {
+  background: var(--bg4); border: 1px solid var(--border); border-radius: 20px;
+  padding: 7px 16px; display: flex; align-items: center; gap: 8px;
+}
+.search-bar input { background: none; border: none; color: var(--text); font-size: 14px; outline: none; flex: 1; }
+.search-bar input::placeholder { color: var(--text3); }
+
+/* ---- TOPBAR for main ---- */
+.view-header {
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  background: var(--bg2); position: sticky; top: 56px; z-index: 50;
+}
+.view-title { font-size: 17px; font-weight: 700; color: var(--text); }
+
+/* ---- RESPONSIVE ---- */
+@media (max-width: 1100px) { #sidebar-right { display: none; } }
+@media (max-width: 768px) { #sidebar-left { display: none; } body #navbar .nav-links { display: none; } }
+</style>
+</head>
+<body>
+
+<!-- NOTIFICATION -->
+<div class="notif-bar" id="notif-bar"></div>
+
+<!-- NAV -->
+<nav id="navbar">
+  <div class="nav-logo" onclick="navigate('feed')" style="cursor:pointer">
+    <div class="logo-icon">🎯</div>
+    Airsoft World Wide
+  </div>
+  <div class="nav-links">
+    <button class="nav-link active" id="nav-feed" onclick="navigate('feed')">Feed</button>
+    <button class="nav-link" id="nav-people" onclick="navigate('people')">People</button>
+    <button class="nav-link" id="nav-map" onclick="navigate('map')">Map</button>
+    <button class="nav-link" id="nav-locations" onclick="navigate('locations')">Locations</button>
+    <button class="nav-link" id="nav-events" onclick="navigate('events')">Events</button>
+    <button class="nav-link" id="nav-content" onclick="navigate('content')">Content</button>
+  </div>
+  <div class="nav-right" id="nav-right">
+    <button class="btn btn-ghost btn-sm" onclick="navigate('auth')">Log in</button>
+    <button class="btn btn-green btn-sm" onclick="navigate('auth')">Join</button>
+  </div>
+</nav>
+
+<!-- APP -->
+<div id="app">
+  <!-- LEFT SIDEBAR -->
+  <aside id="sidebar-left">
+    <div class="sidebar-section">
+      <div class="sidebar-label">Explore</div>
+      <button class="sidebar-item active" id="sb-feed" onclick="navigate('feed')"><span class="sidebar-icon">📰</span> Feed</button>
+      <button class="sidebar-item" id="sb-people" onclick="navigate('people')"><span class="sidebar-icon">👥</span> People</button>
+      <button class="sidebar-item" id="sb-map" onclick="navigate('map')"><span class="sidebar-icon">🗺️</span> Map</button>
+      <button class="sidebar-item" id="sb-locations" onclick="navigate('locations')"><span class="sidebar-icon">📍</span> Locations</button>
+      <button class="sidebar-item" id="sb-events" onclick="navigate('events')"><span class="sidebar-icon">📅</span> Events</button>
+      <button class="sidebar-item" id="sb-content" onclick="navigate('content')"><span class="sidebar-icon">🎬</span> Content</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">You</div>
+      <button class="sidebar-item" id="sb-profile" onclick="navigate('profile')"><span class="sidebar-icon">🪖</span> Profile</button>
+      <button class="sidebar-item" id="sb-loadouts" onclick="navigate('loadouts')"><span class="sidebar-icon">🔫</span> Loadouts</button>
+      <button class="sidebar-item" id="sb-gamediary" onclick="navigate('gamediary')"><span class="sidebar-icon">📖</span> Game Diary</button>
+      <button class="sidebar-item" id="sb-radio" onclick="navigate('radio')"><span class="sidebar-icon">📡</span> Radio Check</button>
+    </div>
+    <div class="sidebar-section">
+      <div class="sidebar-label">Community</div>
+      <button class="sidebar-item" id="sb-features" onclick="navigate('features')"><span class="sidebar-icon">💡</span> Feature Requests</button>
+      <button class="sidebar-item" onclick="showNotif('Discord link: discord.gg/aww')"><span class="sidebar-icon">💬</span> Discord</button>
+    </div>
+    <div class="sidebar-section" id="admin-sidebar-section" style="display:none">
+      <div class="sidebar-label">Admin</div>
+      <button class="sidebar-item" id="sb-admin" onclick="navigate('admin')"><span class="sidebar-icon">⚙️</span> Admin Panel</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main id="main">
+
+    <!-- FEED -->
+    <div class="view active" id="view-feed">
+      <div class="view-header">
+        <span class="view-title">Feed</span>
+        <div class="search-bar" style="width:220px">
+          <span>🔍</span>
+          <input type="text" placeholder="Search posts...">
+        </div>
+      </div>
+      <div style="padding:20px;max-width:680px;margin:0 auto">
+        <!-- Compose -->
+        <div class="compose-box" id="compose-box" style="display:none">
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div class="avatar" id="compose-avatar">?</div>
+            <textarea id="compose-text" placeholder="What's on your mind, airsofter?"></textarea>
+          </div>
+          <div class="compose-actions">
+            <div style="display:flex;gap:8px">
+              <button class="btn btn-ghost btn-sm">📷 Photo</button>
+              <button class="btn btn-ghost btn-sm">📍 Location</button>
+            </div>
+            <button class="btn btn-green btn-sm" onclick="submitPost()">Post</button>
+          </div>
+        </div>
+
+        <!-- GAME DAYS section -->
+        <div style="margin-bottom:20px">
+          <div style="font-size:13px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:10px">Upcoming Game Days</div>
+          <div id="gamedays-list"></div>
+        </div>
+
+        <!-- POSTS -->
+        <div id="posts-list"></div>
+      </div>
+    </div>
+
+    <!-- PEOPLE -->
+    <div class="view" id="view-people">
+      <div class="view-header">
+        <span class="view-title">People</span>
+        <button class="btn btn-green btn-sm" onclick="if(state.user){openModal('add-player')}else{navigate('auth')}">+ Add Friend</button>
+      </div>
+      <div class="people-grid" id="people-grid"></div>
+    </div>
+
+    <!-- MAP -->
+    <div class="view" id="view-map">
+      <div class="map-placeholder">
+        <div class="map-icon">🗺️</div>
+        <div style="color:var(--text2);font-size:16px;font-weight:600">Interactive Map</div>
+        <div style="color:var(--text3);font-size:14px;text-align:center;max-width:300px">Find airsoft sites, players, and events near you. Map integration available after sign in.</div>
+        <button class="btn btn-green" onclick="navigate('auth')">Sign in to view map</button>
+      </div>
+    </div>
+
+    <!-- LOCATIONS -->
+    <div class="view" id="view-locations">
+      <div class="view-header">
+        <span class="view-title">Locations</span>
+        <button class="btn btn-green btn-sm" onclick="if(state.user){openModal('add-location')}else{navigate('auth')}">+ Add Site</button>
+      </div>
+      <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px" id="locations-grid"></div>
+    </div>
+
+    <!-- EVENTS -->
+    <div class="view" id="view-events">
+      <div class="view-header">
+        <span class="view-title">Events</span>
+        <button class="btn btn-green btn-sm" onclick="if(state.user){openModal('add-event')}else{navigate('auth')}">+ Add Event</button>
+      </div>
+      <div style="padding:20px;max-width:720px;margin:0 auto" id="events-list"></div>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="view" id="view-content">
+      <div class="view-header"><span class="view-title">Content</span></div>
+      <div style="padding:20px;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px" id="content-grid"></div>
+    </div>
+
+    <!-- PROFILE -->
+    <div class="view" id="view-profile">
+      <div class="profile-banner">
+        <div class="profile-banner-pattern"></div>
+      </div>
+      <div class="profile-info">
+        <div style="display:flex;align-items:flex-end;justify-content:space-between">
+          <div class="profile-avatar-wrap">
+            <div class="profile-avatar" id="profile-avatar">?</div>
+          </div>
+          <button class="btn btn-outline btn-sm" onclick="openModal('edit-profile')">Edit Profile</button>
+        </div>
+        <div class="profile-callsign" id="profile-callsign">Your Callsign</div>
+        <div class="profile-bio" id="profile-bio">Add a bio...</div>
+        <div class="profile-meta">
+          <span class="profile-meta-item" id="profile-loc-meta">📍 Location not set</span>
+          <span class="profile-meta-item" id="profile-games-meta">🎮 0 games played</span>
+          <span class="profile-meta-item" id="profile-joined-meta">📅 Joined today</span>
+        </div>
+      </div>
+      <div class="profile-tabs">
+        <button class="profile-tab active" onclick="switchProfileTab(this,'tab-posts')">Posts</button>
+        <button class="profile-tab" onclick="switchProfileTab(this,'tab-loadouts')">Loadouts</button>
+        <button class="profile-tab" onclick="switchProfileTab(this,'tab-gamediary')">Game Diary</button>
+        <button class="profile-tab" onclick="switchProfileTab(this,'tab-following')">Following</button>
+      </div>
+      <div class="profile-content">
+        <div id="tab-posts"><div style="color:var(--text3);font-size:14px">No posts yet.</div></div>
+        <div id="tab-loadouts" style="display:none" class="loadouts-area"></div>
+        <div id="tab-gamediary" style="display:none"></div>
+        <div id="tab-following" style="display:none"></div>
+      </div>
+    </div>
+
+    <!-- LOADOUTS -->
+    <div class="view" id="view-loadouts">
+      <div class="view-header">
+        <span class="view-title">My Loadouts</span>
+        <button class="btn btn-green btn-sm" onclick="openModal('add-loadout')">+ New Loadout</button>
+      </div>
+      <div style="padding:20px;max-width:680px;margin:0 auto" id="loadouts-list"></div>
+    </div>
+
+    <!-- GAME DIARY -->
+    <div class="view" id="view-gamediary">
+      <div class="view-header">
+        <span class="view-title">Game Diary</span>
+        <button class="btn btn-green btn-sm" onclick="openModal('add-gameday')">+ Log Game</button>
+      </div>
+      <div style="padding:20px;max-width:680px;margin:0 auto" id="gamediary-list"></div>
+    </div>
+
+    <!-- RADIO CHECK -->
+    <div class="view" id="view-radio">
+      <div class="view-header"><span class="view-title">📡 Radio Check</span></div>
+      <div style="padding:20px;max-width:680px;margin:0 auto">
+        <div style="background:var(--surface);border:1px solid var(--green-darker);border-radius:var(--r2);padding:20px;margin-bottom:20px;text-align:center">
+          <div style="font-size:32px;margin-bottom:10px">📡</div>
+          <div style="font-size:16px;font-weight:700;color:var(--green);margin-bottom:6px">Check in on your fellow players</div>
+          <div style="color:var(--text2);font-size:14px;margin-bottom:16px">Let the community know you're out there. No one fights alone.</div>
+          <button class="btn btn-green" onclick="radioCheck()">📡 Radio Check In</button>
+        </div>
+        <div id="radio-list"></div>
+      </div>
+    </div>
+
+    <!-- FEATURE REQUESTS -->
+    <div class="view" id="view-features">
+      <div class="view-header">
+        <span class="view-title">💡 Feature Requests</span>
+        <button class="btn btn-green btn-sm" onclick="openModal('add-feature')">+ Request Feature</button>
+      </div>
+      <div style="padding:20px;max-width:680px;margin:0 auto" id="features-list"></div>
+    </div>
+
+    <!-- AUTH -->
+    <div class="view" id="view-auth">
+      <div class="auth-card">
+        <div class="auth-logo">
+          <div class="logo-icon">🎯</div>
+          <h1>Airsoft World Wide</h1>
+          <p>Connect with the global airsoft community</p>
+        </div>
+        <div class="auth-tabs">
+          <button class="auth-tab active" id="tab-login-btn" onclick="switchAuthTab('login')">Log In</button>
+          <button class="auth-tab" id="tab-register-btn" onclick="switchAuthTab('register')">Register</button>
+        </div>
+        <!-- Login -->
+        <div id="auth-login">
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="login-email" placeholder="operator@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="login-password" placeholder="••••••••">
+          </div>
+          <button class="btn btn-green" style="width:100%;padding:10px;font-size:15px" onclick="doLogin()">Log In</button>
+          <div style="text-align:center;margin-top:14px;font-size:13px;color:var(--text3)">
+            Demo: use <strong style="color:var(--green)">admin@aww.com / admin</strong> for admin access<br>or any email/password to join as player
+          </div>
+        </div>
+        <!-- Register -->
+        <div id="auth-register" style="display:none">
+          <div class="form-group">
+            <label class="form-label">Callsign</label>
+            <input type="text" class="form-input" id="reg-callsign" placeholder="Your callsign">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email</label>
+            <input type="email" class="form-input" id="reg-email" placeholder="operator@example.com">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Password</label>
+            <input type="password" class="form-input" id="reg-password" placeholder="Min. 6 characters">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Country</label>
+            <select class="form-select" id="reg-country">
+              <option value="">Select country...</option>
+              <option>United Kingdom</option><option>United States</option><option>Australia</option>
+              <option>Canada</option><option>Germany</option><option>France</option>
+              <option>Spain</option><option>Japan</option><option>Hong Kong</option><option>Other</option>
+            </select>
+          </div>
+          <button class="btn btn-green" style="width:100%;padding:10px;font-size:15px" onclick="doRegister()">Create Account</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ADMIN PANEL -->
+    <div class="view" id="view-admin">
+      <div class="view-header">
+        <span class="view-title">⚙️ Admin Panel</span>
+        <span style="font-size:12px;color:var(--text3)">Airsoft World Wide Control Centre</span>
+      </div>
+      <div style="padding:20px">
+        <!-- Stats -->
+        <div class="admin-grid" id="admin-stats-grid"></div>
+
+        <!-- Admin Tabs -->
+        <div class="admin-tabs">
+          <button class="admin-tab active" onclick="switchAdminTab(this,'admin-users')">👥 Users</button>
+          <button class="admin-tab" onclick="switchAdminTab(this,'admin-posts')">📰 Posts</button>
+          <button class="admin-tab" onclick="switchAdminTab(this,'admin-locations-tab')">📍 Locations</button>
+          <button class="admin-tab" onclick="switchAdminTab(this,'admin-events-tab')">📅 Events</button>
+          <button class="admin-tab" onclick="switchAdminTab(this,'admin-features-tab')">💡 Features</button>
+          <button class="admin-tab" onclick="switchAdminTab(this,'admin-settings')">⚙️ Settings</button>
+        </div>
+
+        <!-- Users -->
+        <div class="admin-sub-view active" id="admin-users">
+          <div class="admin-section">
+            <div class="admin-section-title">
+              User Management
+              <button class="btn btn-green btn-sm" onclick="openModal('add-player')">+ Add User</button>
+            </div>
+            <div style="overflow-x:auto">
+              <table class="admin-table" id="admin-users-table">
+                <thead><tr>
+                  <th>User</th><th>Email</th><th>Country</th><th>Role</th>
+                  <th>Status</th><th>Joined</th><th>Games</th><th>Actions</th>
+                </tr></thead>
+                <tbody id="admin-users-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- Posts -->
+        <div class="admin-sub-view" id="admin-posts">
+          <div class="admin-section">
+            <div class="admin-section-title">Post Management</div>
+            <div id="admin-posts-list"></div>
+          </div>
+        </div>
+
+        <!-- Locations -->
+        <div class="admin-sub-view" id="admin-locations-tab">
+          <div class="admin-section">
+            <div class="admin-section-title">
+              Locations
+              <button class="btn btn-green btn-sm" onclick="openModal('add-location')">+ Add Location</button>
+            </div>
+            <table class="admin-table"><thead><tr><th>Site</th><th>Type</th><th>Location</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="admin-locations-body"></tbody></table>
+          </div>
+        </div>
+
+        <!-- Events -->
+        <div class="admin-sub-view" id="admin-events-tab">
+          <div class="admin-section">
+            <div class="admin-section-title">
+              Events
+              <button class="btn btn-green btn-sm" onclick="openModal('add-event')">+ Add Event</button>
+            </div>
+            <table class="admin-table"><thead><tr><th>Event</th><th>Location</th><th>Date</th><th>Posted by</th><th>Actions</th></tr></thead>
+            <tbody id="admin-events-body"></tbody></table>
+          </div>
+        </div>
+
+        <!-- Features -->
+        <div class="admin-sub-view" id="admin-features-tab">
+          <div class="admin-section">
+            <div class="admin-section-title">Feature Requests</div>
+            <table class="admin-table"><thead><tr><th>Feature</th><th>Votes</th><th>Status</th><th>Actions</th></tr></thead>
+            <tbody id="admin-features-body"></tbody></table>
+          </div>
+        </div>
+
+        <!-- Settings -->
+        <div class="admin-sub-view" id="admin-settings">
+          <div class="admin-section">
+            <div class="admin-section-title">Platform Settings</div>
+            <div style="display:grid;gap:14px;max-width:500px">
+              <div class="form-group">
+                <label class="form-label">Platform Name</label>
+                <input class="form-input" id="setting-name" value="Airsoft World Wide">
+              </div>
+              <div class="form-group">
+                <label class="form-label">Registration</label>
+                <select class="form-select" id="setting-reg">
+                  <option>Open (anyone can join)</option>
+                  <option>Invite Only</option>
+                  <option>Closed</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Default Country</label>
+                <select class="form-select">
+                  <option>United Kingdom</option><option>United States</option><option>Global</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Pinned Announcement</label>
+                <textarea class="form-textarea" id="setting-announcement" placeholder="Post a pinned announcement..."></textarea>
+              </div>
+              <div style="display:flex;gap:10px;flex-wrap:wrap">
+                <button class="btn btn-green" onclick="showNotif('Settings saved!')">Save Settings</button>
+                <button class="btn btn-outline" onclick="showNotif('Cache cleared!')">Clear Cache</button>
+                <button class="btn btn-red" onclick="showNotif('⚠️ Action cancelled for demo')">Reset Platform</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- RIGHT SIDEBAR -->
+  <aside id="sidebar-right">
+    <!-- Stats -->
+    <div class="stats-card">
+      <div class="stats-title">Platform Stats</div>
+      <div class="stats-grid">
+        <div class="stat-box"><div class="stat-num" id="stat-profiles">210</div><div class="stat-lbl">Profiles</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-published">125</div><div class="stat-lbl">Published</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-games">415</div><div class="stat-lbl">Games</div></div>
+        <div class="stat-box"><div class="stat-num" id="stat-countries">11</div><div class="stat-lbl">Countries</div></div>
+        <div class="stat-box"><div class="stat-num">12</div><div class="stat-lbl">Active Today</div></div>
+        <div class="stat-box"><div class="stat-num">52</div><div class="stat-lbl">This Week</div></div>
+      </div>
+    </div>
+
+    <!-- Activity -->
+    <div class="stats-card">
+      <div class="stats-title">Recent Activity</div>
+      <div id="activity-feed"></div>
+    </div>
+
+    <!-- Social -->
+    <div class="stats-card">
+      <div class="stats-title">Find Us</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <a href="#" class="btn btn-ghost btn-sm">Discord</a>
+        <a href="#" class="btn btn-ghost btn-sm">Instagram</a>
+        <a href="#" class="btn btn-ghost btn-sm">TikTok</a>
+        <a href="#" class="btn btn-ghost btn-sm">Facebook</a>
+      </div>
+    </div>
+
+    <!-- Links -->
+    <div style="padding:10px 0;font-size:12px;color:var(--text3);display:flex;gap:10px;flex-wrap:wrap">
+      <a href="#" onclick="showNotif('Terms page')">Terms</a>
+      <a href="#" onclick="showNotif('Privacy page')">Privacy</a>
+      <a href="#" onclick="showNotif('Guidelines page')">Guidelines</a>
+      <a href="#" onclick="showNotif('Safety page')">Safety</a>
+    </div>
+    <div style="font-size:12px;color:var(--text3)">© 2026 Airsoft World Wide</div>
+  </aside>
+</div>
+
+<!-- MODALS -->
+<div class="modal-overlay hidden" id="modal-overlay" onclick="closeModalOnBg(event)">
+  <div class="modal" id="modal-box"></div>
+</div>
+
+<script>
+// ============================================================
+// STATE
+// ============================================================
+const state = {
+  view: 'feed',
+  user: null,
+  users: [
+    { id:1, callsign:'Admin', email:'admin@aww.com', password:'admin', country:'United Kingdom', role:'admin', status:'active', joined:'01 Jan 2026', games:42, bio:'Platform administrator.', initials:'AD' },
+    { id:2, callsign:'Kilo', email:'kilo@aww.com', password:'kilo', country:'United Kingdom', role:'mod', status:'active', joined:'15 Jan 2026', games:87, bio:'Field commander. GBBR enthusiast.', initials:'KI' },
+    { id:3, callsign:'N.O.C Ronin', email:'ronin@aww.com', password:'ronin', country:'United Kingdom', role:'member', status:'active', joined:'20 Jan 2026', games:56, bio:'Milsim player.', initials:'NR' },
+    { id:4, callsign:'Airsoft Dad', email:'dad@aww.com', password:'dad', country:'United Kingdom', role:'member', status:'active', joined:'22 Feb 2026', games:34, bio:'CQB skirmisher and designated battle bus driver.', initials:'AD' },
+    { id:5, callsign:'Matt', email:'matt@aww.com', password:'matt', country:'United Kingdom', role:'member', status:'active', joined:'10 Mar 2026', games:61, bio:'Site regular and community builder.', initials:'MT' },
+    { id:6, callsign:'Taylor', email:'taylor@aww.com', password:'taylor', country:'United Kingdom', role:'member', status:'active', joined:'05 Apr 2026', games:28, bio:'Woodland player.', initials:'TA' },
+  ],
+  posts: [
+    { id:1, author:'Admin', initials:'AD', badge:'Announcement', time:'Jun 26, 2026', pinned:true, body:`💬❓ QUESTION OF THE DAY ❓💬\n\nWhat's the BIGGEST mistake a new airsoft player can make? Whether that's on a game day, or even when they're just starting out!\n\nLet us know below!`, reactions:{thumbs:24,fire:18,target:31,skull:5}, comments:[] },
+    { id:2, author:'Matt', initials:'MT', time:'6h ago', body:'If you could only play one airsoft site for the rest of your life, which site are you choosing?', reactions:{thumbs:12,fire:8,target:6,skull:1}, comments:[] },
+    { id:3, author:'Airsoft Dad', initials:'AD', time:'Jun 24, 2026', body:'Off to Chemical Airsoft on Sunday. Come say hi if you\'re there!', reactions:{thumbs:19,fire:4,target:9,skull:0}, comments:[] },
+    { id:4, author:'Admin', initials:'AD', badge:'Announcement', time:'Jun 11, 2026', pinned:false, body:`🚀 NEW UPDATE\n\nWelcome to Airsoft World Wide! The global home for airsoft players.\n\n👉 Multi-column layout for easy navigation\n👉 Player profiles with loadout tracking\n👉 Game diary to log your skirmishes\n👉 Global events board\n\nLet us know what you think!`, reactions:{thumbs:41,fire:33,target:28,skull:3}, comments:[] },
+  ],
+  gamedays: [
+    { id:1, date:'27 Jun', month:'JUN', dow:'Sat', year:'2026', site:'Gunman Airsoft Tuddenham', location:'Tuddenham, Bury St Edmunds', players:['KI'], status:'Upcoming' },
+    { id:2, date:'28 Jun', month:'JUN', dow:'Sun', year:'2026', site:'Vendetta', location:'Gloucester', players:['NR','TA'], status:'Upcoming' },
+    { id:3, date:'4 Jul', month:'JUL', dow:'Sat', year:'2026', site:'Strikeforce CQB', location:'Gloucester', players:['MT'], status:'Upcoming' },
+    { id:4, date:'5 Jul', month:'JUL', dow:'Sun', year:'2026', site:'F&O - The Base CQC', location:'Calne, Wiltshire', players:['NR'], status:'Upcoming' },
+    { id:5, date:'19 Jul', month:'JUL', dow:'Sun', year:'2026', site:'Airsoft Plantation', location:'Chelmsford', players:['KI','MT'], status:'Upcoming' },
+  ],
+  locations: [
+    { id:1, name:'Gunman Airsoft Tuddenham', type:'Woodland', loc:'Tuddenham, Suffolk', emoji:'🌲', tags:['Woodland','Full-Day','Hire Available'] },
+    { id:2, name:'Chemical Airsoft', type:'CQB / Woodland', loc:'Ashton-under-Lyne, Greater Manchester', emoji:'🏭', tags:['CQB','Woodland'] },
+    { id:3, name:'Vendetta', type:'CQB', loc:'Gloucester', emoji:'🏙️', tags:['CQB','Indoor'] },
+    { id:4, name:'Strikeforce CQB', type:'CQB', loc:'Gloucester', emoji:'⚔️', tags:['CQB','Indoor','Night Games'] },
+    { id:5, name:'F&O - The Base CQC', type:'CQC', loc:'Calne, Wiltshire', emoji:'🏚️', tags:['CQC','Regular Games'] },
+    { id:6, name:'Combat Airsoft', type:'Woodland', loc:'Thetford, Norfolk', emoji:'🌿', tags:['Woodland','Milsim'] },
+    { id:7, name:'Airsoft Plantation', type:'Woodland', loc:'Chelmsford, Essex', emoji:'🌳', tags:['Woodland','Hire Available'] },
+    { id:8, name:'Drakes Island', type:'Woodland/CQB', loc:'Plymouth, Devon', emoji:'🏝️', tags:['Island Site','Unique','Milsim'] },
+  ],
+  events: [
+    { id:1, title:'Stirling Airsoft | Operation Highworth 6', loc:'Baghdad (Iraq theme), UK', date:'Aug 2026', desc:'Six months after the disappearance of the engineering team near Samarra, the effects of The Broker\'s network are no longer subtle — they\'re strategic. Baghdad is on edge as national elections approach...', author:'Kilo', posted:'Jun 25, 2026' },
+    { id:2, title:'OZ1 | Wasteland: Shatterpoint', loc:'TBC', date:'2026', desc:'OZ1 Airsoft\'s 2026 event — Wasteland: SHATTERPOINT. Two teams, the LEGION OF ORDER and the CHAOS RAIDERS, will complete three days of missions to battle for victory.', author:'Kilo', posted:'Jun 22, 2026' },
+    { id:3, title:'40 Strong: Battle For Taz-istan', loc:'UK', date:'2026', desc:'Step into the chaos of a war-torn region where rival forces clash for control in one of the most immersive airsoft experiences of the year.', author:'Icarus', posted:'May 11, 2026' },
+    { id:4, title:'Airsoft Weekend', loc:'UK', date:'Summer 2026', desc:'A three-day airsoft event packed with action, community, and good vibes. Free camping included.', author:'Matt', posted:'May 5, 2026' },
+    { id:5, title:'Combat Airsoft | Operation Valhalla 2026', loc:'Thetford, Norfolk', date:'Autumn 2026', desc:'Operation Valhalla is Combat Airsoft\'s once-a-year weekend event — two full days of engaging airsoft gameplay.', author:'Kilo', posted:'Apr 29, 2026' },
+  ],
+  content: [
+    { id:1, title:'Northeast FAMAS GBBR — NPAS Development', author:'[HRC] Bridges', time:'Jun 19', type:'Video', preview:'🎥' },
+    { id:2, title:'IWA 2026 — Mini-14 GBBR', author:'[HRC] Bridges', time:'Jun 13', type:'Video', preview:'🎬' },
+    { id:3, title:'Loadout Video — Team Dawson', author:'LoneTreeMilsim', time:'Jun 7', type:'Video', preview:'📹' },
+    { id:4, title:'DC-1 YouTube — Mental Health Awareness', author:'DC-1', time:'Jun 17', type:'Video', preview:'🎞️' },
+    { id:5, title:'Cyelee Optics Point Blank Test', author:'[HRC] Bridges', time:'Jun 27', type:'Review', preview:'🔭' },
+    { id:6, title:'Airsoft Ghillie Sniper Handbook — Launch Event', author:'Zander', time:'May 11', type:'Event', preview:'📖' },
+  ],
+  features: [
+    { id:1, title:'A tab for video / slideshows like Instagram or TikTok', submitter:'poke', votes:23, status:'planned', votedBy:[] },
+    { id:2, title:'Team / squad pages', submitter:'Admin', votes:41, status:'in-progress', votedBy:[] },
+    { id:3, title:'Push notifications for game days', submitter:'Kilo', votes:35, status:'planned', votedBy:[] },
+    { id:4, title:'Dark/light mode toggle', submitter:'Matt', votes:18, status:'done', votedBy:[] },
+    { id:5, title:'Gear marketplace — buy/sell/trade', submitter:'Airsoft Dad', votes:56, status:'planned', votedBy:[] },
+    { id:6, title:'Team-based tournaments / leaderboards', submitter:'N.O.C Ronin', votes:29, status:'planned', votedBy:[] },
+  ],
+  radio: [
+    { callsign:'Kilo', initials:'KI', time:'2h ago', status:'At Combat Airsoft — who else is going today?' },
+    { callsign:'Airsoft Dad', initials:'AD', time:'5h ago', status:'Battle bus is loaded, heading to Chemical tomorrow!' },
+    { callsign:'Matt', initials:'MT', time:'1d ago', status:'Anyone else on the Gloucestershire scene? Looking for skirmish buddies.' },
+  ],
+  loadouts: [
+    { id:1, owner:2, name:'CQB Skirmish', items:['TM HK45', 'Multicam Black', 'Fast Helmet', 'Plate Carrier', 'M-LOK Rail', 'Green Gas'] },
+    { id:2, owner:2, name:'Woodland Milsim', items:['CYMA AK74', 'MTP Camo', 'Bump Helmet', 'Chest Rig', '0.28g BBs', 'AN/PEQ Box'] },
+  ],
+  activity: [
+    { text:'Taylor added a new game day at Vendetta on Sun Jun 28', time:'Jun 25', initials:'TA' },
+    { text:'N.O.C Ronin added game days at F&O - The Base CQC ×4', time:'Jun 23', initials:'NR' },
+    { text:'Airsoft Dad updated loadout: CQB Skirmish', time:'Jun 23', initials:'AD' },
+    { text:'Matt added a game day at Combat Airsoft', time:'Jun 24', initials:'MT' },
+    { text:'poke submitted feature request: "Video tab"', time:'Jun 23', initials:'PK' },
+    { text:'Kilo posted about Operation Highworth 6', time:'Jun 25', initials:'KI' },
+  ],
+};
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function navigate(view) {
+  state.view = view;
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-link,.sidebar-item').forEach(b => b.classList.remove('active'));
+  const viewEl = document.getElementById('view-' + view);
+  if (viewEl) viewEl.classList.add('active');
+  const navEl = document.getElementById('nav-' + view);
+  if (navEl) navEl.classList.add('active');
+  const sbEl = document.getElementById('sb-' + view);
+  if (sbEl) sbEl.classList.add('active');
+  renderView(view);
+  window.scrollTo(0,0);
+}
+
+function renderView(view) {
+  if (view === 'feed') renderFeed();
+  if (view === 'people') renderPeople();
+  if (view === 'locations') renderLocations();
+  if (view === 'events') renderEvents();
+  if (view === 'content') renderContent();
+  if (view === 'profile') renderProfile();
+  if (view === 'loadouts') renderLoadouts();
+  if (view === 'gamediary') renderGameDiary();
+  if (view === 'radio') renderRadio();
+  if (view === 'features') renderFeatures();
+  if (view === 'admin') renderAdmin();
+  renderActivity();
+}
+
+// ============================================================
+// RENDER FEED
+// ============================================================
+function renderFeed() {
+  // Game days
+  const gdl = document.getElementById('gamedays-list');
+  gdl.innerHTML = state.gamedays.slice(0,4).map(g => `
+    <div class="gameday-card">
+      <div class="gameday-date">
+        <div class="gameday-day">${g.date.split(' ')[0]}</div>
+        <div class="gameday-month">${g.month}</div>
+        <div class="gameday-dow">${g.dow}</div>
+      </div>
+      <div class="gameday-info">
+        <div class="gameday-site">${g.site}</div>
+        <div class="gameday-loc">📍 ${g.location}</div>
+      </div>
+      <div style="display:flex;flex-direction:column;align-items:flex-end;gap:6px">
+        <span class="upcoming-badge">${g.status}</span>
+        <div class="gameday-players">
+          ${g.players.map(p=>`<div class="player-bubble">${p}</div>`).join('')}
+          <span style="font-size:12px;color:var(--text3);margin-left:4px">${g.players.length}</span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  // Compose
+  document.getElementById('compose-box').style.display = state.user ? 'block' : 'none';
+  if (state.user) {
+    document.getElementById('compose-avatar').textContent = state.user.initials;
+  }
+
+  // Posts
+  const pl = document.getElementById('posts-list');
+  const sorted = [...state.posts].sort((a,b) => (b.pinned?1:0)-(a.pinned?1:0));
+  pl.innerHTML = sorted.map(p => renderPost(p)).join('');
+}
+
+function renderPost(p) {
+  const reactions = [
+    { key:'thumbs', emoji:'👍' },
+    { key:'fire', emoji:'🔥' },
+    { key:'target', emoji:'🎯' },
+    { key:'skull', emoji:'💀' },
+  ];
+  return `
+    <div class="post-card${p.pinned?' pinned':''}">
+      ${p.pinned ? '<div class="post-pin-bar">📌 Pinned</div>' : ''}
+      <div class="post-header">
+        <div class="avatar">${p.initials}</div>
+        <div class="post-meta">
+          <span class="post-author">${p.author}</span>
+          ${p.badge ? `<span class="post-badge">${p.badge}</span>` : ''}
+          <div class="post-time">${p.time}</div>
+        </div>
+        ${state.user && (state.user.role==='admin'||state.user.role==='mod') ? `
+          <div style="display:flex;gap:4px">
+            ${p.pinned ? `<button class="btn btn-ghost btn-sm" onclick="togglePin(${p.id})">📌 Unpin</button>` : `<button class="btn btn-ghost btn-sm" onclick="togglePin(${p.id})">📌 Pin</button>`}
+            <button class="btn btn-red btn-sm" onclick="deletePost(${p.id})">🗑</button>
+          </div>
+        ` : ''}
+      </div>
+      <div class="post-body">${escHtml(p.body)}</div>
+      <div class="post-reactions">
+        ${reactions.map(r => `
+          <button class="reaction-btn${p.reacted===r.key?' reacted':''}" onclick="react(${p.id},'${r.key}')">
+            ${r.emoji} ${p.reactions[r.key]}
+          </button>
+        `).join('')}
+        <button class="reaction-btn" onclick="toggleComments(${p.id})">💬 ${p.comments.length}</button>
+      </div>
+      <div class="comment-section" id="comments-${p.id}" style="display:none">
+        ${p.comments.map(c => `
+          <div class="comment">
+            <div class="avatar">${c.initials}</div>
+            <div class="comment-content">
+              <span class="post-author">${c.author}</span>
+              <p>${escHtml(c.text)}</p>
+            </div>
+          </div>
+        `).join('')}
+        ${state.user ? `
+          <div class="comment-input-row">
+            <div class="avatar">${state.user.initials}</div>
+            <textarea placeholder="Write a comment..." id="comment-input-${p.id}" rows="1" onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();submitComment(${p.id})}"></textarea>
+            <button class="btn btn-green btn-sm" onclick="submitComment(${p.id})">Post</button>
+          </div>
+        ` : '<div style="font-size:13px;color:var(--text3);padding:6px 0"><a href="#" onclick="navigate(\'auth\')">Log in</a> to comment</div>'}
+      </div>
+    </div>
+  `;
+}
+
+function react(postId, key) {
+  if (!state.user) { showNotif('Log in to react'); return; }
+  const p = state.posts.find(x=>x.id===postId);
+  if (p.reacted === key) { p.reactions[key]--; p.reacted = null; }
+  else { if (p.reacted) p.reactions[p.reacted]--; p.reactions[key]++; p.reacted = key; }
+  renderFeed();
+}
+
+function toggleComments(id) {
+  const el = document.getElementById('comments-'+id);
+  el.style.display = el.style.display === 'none' ? 'block' : 'none';
+}
+
+function submitComment(postId) {
+  const inp = document.getElementById('comment-input-'+postId);
+  if (!inp || !inp.value.trim()) return;
+  const p = state.posts.find(x=>x.id===postId);
+  p.comments.push({ author: state.user.callsign, initials: state.user.initials, text: inp.value.trim() });
+  renderFeed();
+  const el = document.getElementById('comments-'+postId);
+  if (el) el.style.display = 'block';
+}
+
+function submitPost() {
+  const txt = document.getElementById('compose-text').value.trim();
+  if (!txt) return;
+  state.posts.unshift({ id: Date.now(), author: state.user.callsign, initials: state.user.initials, time: 'Just now', body: txt, reactions:{thumbs:0,fire:0,target:0,skull:0}, comments:[] });
+  document.getElementById('compose-text').value = '';
+  state.stat_profiles = (parseInt(document.getElementById('stat-profiles').textContent)+1);
+  renderFeed();
+  showNotif('Post published!');
+}
+
+function togglePin(id) {
+  const p = state.posts.find(x=>x.id===id);
+  p.pinned = !p.pinned;
+  renderFeed();
+  showNotif(p.pinned ? 'Post pinned!' : 'Post unpinned!');
+}
+
+function deletePost(id) {
+  if (!confirm('Delete this post?')) return;
+  state.posts = state.posts.filter(p=>p.id!==id);
+  renderFeed();
+  if (state.view==='admin') renderAdmin();
+  showNotif('Post deleted.');
+}
+
+// ============================================================
+// RENDER PEOPLE
+// ============================================================
+function renderPeople() {
+  const grid = document.getElementById('people-grid');
+  grid.innerHTML = state.users.map(u => `
+    <div class="player-card" onclick="viewPlayer(${u.id})">
+      <div class="avatar" style="width:60px;height:60px;font-size:22px;margin:0 auto 10px">${u.initials}</div>
+      <div class="player-callsign">${u.callsign}</div>
+      <div class="player-loc">📍 ${u.country}</div>
+      ${u.role==='admin'?`<div style="margin-top:4px"><span style="font-size:11px;background:var(--green-darker);color:#000;padding:2px 8px;border-radius:20px;font-weight:600">Admin</span></div>`:''}
+      ${u.role==='mod'?`<div style="margin-top:4px"><span style="font-size:11px;background:var(--bg4);color:var(--green);padding:2px 8px;border-radius:20px;border:1px solid var(--border2)">Mod</span></div>`:''}
+      <div class="player-stats">
+        <div class="player-stat"><span class="player-stat-val">${u.games}</span><span class="player-stat-lbl">Games</span></div>
+      </div>
+    </div>
+  `).join('');
+}
+
+function viewPlayer(id) {
+  navigate('profile');
+}
+
+// ============================================================
+// RENDER LOCATIONS
+// ============================================================
+function renderLocations() {
+  const grid = document.getElementById('locations-grid');
+  grid.innerHTML = state.locations.map(l => `
+    <div class="location-card">
+      <div class="location-banner">${l.emoji}</div>
+      <div class="location-body">
+        <div class="location-name">${l.name}</div>
+        <div class="location-type">${l.type}</div>
+        <div class="location-loc">📍 ${l.loc}</div>
+        <div class="location-tags">${l.tags.map(t=>`<span class="tag">${t}</span>`).join('')}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// RENDER EVENTS
+// ============================================================
+function renderEvents() {
+  const list = document.getElementById('events-list');
+  list.innerHTML = state.events.map(e => `
+    <div class="event-card">
+      <div class="event-title">${e.title}</div>
+      <div class="event-loc">📍 ${e.loc} &nbsp;·&nbsp; 📅 ${e.date}</div>
+      <div class="event-desc">${e.desc.length>280?e.desc.slice(0,280)+'...':e.desc}</div>
+      <div class="event-footer">
+        <div class="avatar" style="width:28px;height:28px;font-size:11px">${e.author.slice(0,2).toUpperCase()}</div>
+        <span style="font-size:13px;color:var(--text2)">${e.author}</span>
+        <span style="font-size:12px;color:var(--text3);margin-left:auto">${e.posted}</span>
+        <button class="btn btn-green btn-sm" onclick="showNotif('Bookmarked!')">📌 Save</button>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// RENDER CONTENT
+// ============================================================
+function renderContent() {
+  const grid = document.getElementById('content-grid');
+  grid.innerHTML = state.content.map(c => `
+    <div class="location-card" style="cursor:pointer" onclick="showNotif('Opening content: ${c.title.slice(0,30)}...')">
+      <div class="location-banner" style="font-size:52px">${c.preview}</div>
+      <div class="location-body">
+        <div class="location-name">${c.title}</div>
+        <div class="location-type">${c.type}</div>
+        <div class="location-loc">👤 ${c.author} &nbsp;·&nbsp; ${c.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// RENDER PROFILE
+// ============================================================
+function renderProfile() {
+  if (!state.user) { navigate('auth'); return; }
+  const u = state.user;
+  document.getElementById('profile-avatar').textContent = u.initials;
+  document.getElementById('profile-callsign').textContent = u.callsign;
+  document.getElementById('profile-bio').textContent = u.bio || 'No bio yet.';
+  document.getElementById('profile-loc-meta').textContent = '📍 ' + (u.country || 'Location not set');
+  document.getElementById('profile-games-meta').textContent = '🎮 ' + u.games + ' games played';
+  document.getElementById('profile-joined-meta').textContent = '📅 Joined ' + u.joined;
+
+  // Posts tab
+  const myPosts = state.posts.filter(p => p.author === u.callsign);
+  document.getElementById('tab-posts').innerHTML = myPosts.length ? myPosts.map(p=>renderPost(p)).join('') : '<div style="color:var(--text3);font-size:14px">No posts yet.</div>';
+
+  // Loadouts
+  const myLoadouts = state.loadouts.filter(l=>l.owner===u.id);
+  document.getElementById('tab-loadouts').innerHTML = myLoadouts.length ? myLoadouts.map(l=>`
+    <div class="loadout-card">
+      <div class="loadout-name">🔫 ${l.name}</div>
+      <div class="loadout-items">${l.items.map(i=>`<span class="loadout-item">${i}</span>`).join('')}</div>
+    </div>
+  `).join('') : '<div style="color:var(--text3);font-size:14px">No loadouts yet.</div>';
+}
+
+function switchProfileTab(btn, tabId) {
+  document.querySelectorAll('.profile-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#view-profile .profile-content > div').forEach(d=>d.style.display='none');
+  document.getElementById(tabId).style.display = 'block';
+}
+
+// ============================================================
+// RENDER LOADOUTS
+// ============================================================
+function renderLoadouts() {
+  if (!state.user) { navigate('auth'); return; }
+  const list = document.getElementById('loadouts-list');
+  const mine = state.loadouts.filter(l=>l.owner===state.user.id);
+  list.innerHTML = mine.length ? mine.map(l=>`
+    <div class="loadout-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <div class="loadout-name">🔫 ${l.name}</div>
+        <div style="display:flex;gap:6px">
+          <button class="admin-action-btn" onclick="editLoadout(${l.id})">Edit</button>
+          <button class="admin-action-btn danger" onclick="deleteLoadout(${l.id})">Delete</button>
+        </div>
+      </div>
+      <div class="loadout-items">${l.items.map(i=>`<span class="loadout-item">${i}</span>`).join('')}</div>
+    </div>
+  `).join('') : '<div style="color:var(--text3);text-align:center;padding:40px"><div style="font-size:40px;margin-bottom:12px">🔫</div><div>No loadouts yet. Add your first build!</div></div>';
+}
+
+function deleteLoadout(id) {
+  state.loadouts = state.loadouts.filter(l=>l.id!==id);
+  renderLoadouts();
+  showNotif('Loadout deleted.');
+}
+
+// ============================================================
+// RENDER GAME DIARY
+// ============================================================
+function renderGameDiary() {
+  const list = document.getElementById('gamediary-list');
+  list.innerHTML = state.gamedays.map(g=>`
+    <div class="gameday-card" style="margin-bottom:10px">
+      <div class="gameday-date">
+        <div class="gameday-day">${g.date.split(' ')[0]}</div>
+        <div class="gameday-month">${g.month}</div>
+        <div class="gameday-dow">${g.dow}</div>
+      </div>
+      <div class="gameday-info">
+        <div class="gameday-site">${g.site}</div>
+        <div class="gameday-loc">📍 ${g.location}</div>
+      </div>
+      <span class="upcoming-badge" style="background:rgba(34,197,94,0.15);color:var(--green);border-color:var(--green-darker)">${g.status}</span>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// RENDER RADIO CHECK
+// ============================================================
+function renderRadio() {
+  const list = document.getElementById('radio-list');
+  list.innerHTML = state.radio.map(r=>`
+    <div class="radio-card">
+      <div style="display:flex;align-items:center;gap:10px">
+        <div class="avatar">${r.initials}</div>
+        <div>
+          <div style="font-weight:600;color:var(--green)">${r.callsign}</div>
+          <div style="font-size:12px;color:var(--text3)">${r.time}</div>
+        </div>
+        <span class="radio-status"></span>
+      </div>
+      <div style="margin-top:8px;font-size:14px;color:var(--text2)">${r.status}</div>
+    </div>
+  `).join('');
+}
+
+function radioCheck() {
+  if (!state.user) { navigate('auth'); return; }
+  state.radio.unshift({ callsign: state.user.callsign, initials: state.user.initials, time:'Just now', status:'Online and ready — radio check acknowledged! 📡' });
+  renderRadio();
+  showNotif('Radio check sent! 📡');
+}
+
+// ============================================================
+// RENDER FEATURES
+// ============================================================
+function renderFeatures() {
+  const list = document.getElementById('features-list');
+  const sorted = [...state.features].sort((a,b)=>b.votes-a.votes);
+  list.innerHTML = sorted.map(f=>`
+    <div class="feature-card">
+      <div class="feature-vote">
+        <button class="vote-btn${f.votedBy.includes(state.user?.id)?' voted':''}" onclick="voteFeature(${f.id})">
+          <span>▲</span>
+          <span class="vote-count">${f.votes}</span>
+        </button>
+      </div>
+      <div class="feature-info">
+        <div class="feature-title">${f.title}</div>
+        <div class="feature-sub">Requested by ${f.submitter}</div>
+      </div>
+      <span class="feature-status ${f.status}">${f.status==='in-progress'?'In Progress':f.status==='done'?'Done':'Planned'}</span>
+    </div>
+  `).join('');
+}
+
+function voteFeature(id) {
+  if (!state.user) { showNotif('Log in to vote'); return; }
+  const f = state.features.find(x=>x.id===id);
+  if (f.votedBy.includes(state.user.id)) {
+    f.votes--; f.votedBy = f.votedBy.filter(v=>v!==state.user.id);
+  } else {
+    f.votes++; f.votedBy.push(state.user.id);
+  }
+  renderFeatures();
+  if (state.view==='admin') renderAdmin();
+}
+
+// ============================================================
+// RENDER ACTIVITY
+// ============================================================
+function renderActivity() {
+  const feed = document.getElementById('activity-feed');
+  if (!feed) return;
+  feed.innerHTML = state.activity.slice(0,6).map(a=>`
+    <div class="activity-item">
+      <div class="avatar">${a.initials}</div>
+      <div class="activity-text">${a.text}</div>
+      <div class="activity-time">${a.time}</div>
+    </div>
+  `).join('');
+}
+
+// ============================================================
+// ADMIN
+// ============================================================
+function renderAdmin() {
+  if (!state.user || state.user.role !== 'admin') { navigate('feed'); return; }
+
+  // Stats
+  document.getElementById('admin-stats-grid').innerHTML = [
+    { val: state.users.length, lbl: 'Total Users', change: '+3 this week' },
+    { val: state.posts.length, lbl: 'Total Posts', change: '+'+state.posts.length+' total' },
+    { val: state.locations.length, lbl: 'Sites Listed', change: 'Across '+state.users.length+' countries' },
+    { val: state.events.length, lbl: 'Events', change: 'Upcoming & past' },
+    { val: state.gamedays.reduce((s,g)=>s+g.players.length,0), lbl: 'Game Registrations', change: '' },
+    { val: state.features.length, lbl: 'Feature Requests', change: state.features.filter(f=>f.status==='in-progress').length+' in progress' },
+  ].map(s=>`
+    <div class="admin-stat">
+      <div class="admin-stat-val">${s.val}</div>
+      <div class="admin-stat-lbl">${s.lbl}</div>
+      <div class="admin-stat-change">${s.change}</div>
+    </div>
+  `).join('');
+
+  // Users table
+  document.getElementById('admin-users-body').innerHTML = state.users.map(u=>`
+    <tr>
+      <td><div class="user-cell"><div class="avatar" style="width:28px;height:28px;font-size:11px">${u.initials}</div>${u.callsign}</div></td>
+      <td>${u.email}</td>
+      <td>${u.country}</td>
+      <td><span style="font-size:12px;color:${u.role==='admin'?'var(--green)':u.role==='mod'?'#60a5fa':'var(--text2)'}">${u.role}</span></td>
+      <td><span class="status-dot ${u.status==='active'?'green':'gray'}"></span> ${u.status}</td>
+      <td>${u.joined}</td>
+      <td>${u.games}</td>
+      <td style="display:flex;gap:4px;flex-wrap:wrap">
+        <button class="admin-action-btn" onclick="editUser(${u.id})">Edit</button>
+        <button class="admin-action-btn" onclick="promoteUser(${u.id})">${u.role==='mod'?'Demote':'Promote'}</button>
+        <button class="admin-action-btn" onclick="toggleUserStatus(${u.id})">${u.status==='active'?'Suspend':'Unsuspend'}</button>
+        ${u.id!==state.user.id?`<button class="admin-action-btn danger" onclick="deleteUser(${u.id})">Delete</button>`:''}
+      </td>
+    </tr>
+  `).join('');
+
+  // Posts
+  document.getElementById('admin-posts-list').innerHTML = state.posts.map(p=>`
+    <div class="loadout-card" style="margin-bottom:8px">
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <div>
+          <span style="font-weight:600">${p.author}</span>
+          ${p.pinned?'<span style="font-size:11px;background:var(--green-darker);color:#000;padding:1px 8px;border-radius:20px;margin-left:6px;font-weight:600">Pinned</span>':''}
+          <span style="font-size:12px;color:var(--text3);margin-left:8px">${p.time}</span>
+        </div>
+        <div style="display:flex;gap:4px">
+          <button class="admin-action-btn" onclick="togglePin(${p.id})">${p.pinned?'Unpin':'Pin'}</button>
+          <button class="admin-action-btn danger" onclick="deletePost(${p.id})">Delete</button>
+        </div>
+      </div>
+      <div style="font-size:14px;color:var(--text2);margin-top:6px;white-space:pre-wrap">${escHtml(p.body.slice(0,200))}${p.body.length>200?'...':''}</div>
+    </div>
+  `).join('');
+
+  // Locations
+  document.getElementById('admin-locations-body').innerHTML = state.locations.map(l=>`
+    <tr>
+      <td>${l.emoji} ${l.name}</td>
+      <td>${l.type}</td>
+      <td>${l.loc}</td>
+      <td><span class="status-dot green"></span> Active</td>
+      <td style="display:flex;gap:4px">
+        <button class="admin-action-btn" onclick="showNotif('Edit: ${l.name.slice(0,20)}')">Edit</button>
+        <button class="admin-action-btn danger" onclick="deleteLocation(${l.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Events
+  document.getElementById('admin-events-body').innerHTML = state.events.map(e=>`
+    <tr>
+      <td style="max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${e.title}</td>
+      <td>${e.loc}</td>
+      <td>${e.date}</td>
+      <td>${e.author}</td>
+      <td style="display:flex;gap:4px">
+        <button class="admin-action-btn" onclick="showNotif('Edit event')">Edit</button>
+        <button class="admin-action-btn danger" onclick="deleteEvent(${e.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+
+  // Features
+  document.getElementById('admin-features-body').innerHTML = state.features.map(f=>`
+    <tr>
+      <td>${f.title}</td>
+      <td>${f.votes}</td>
+      <td>
+        <select style="background:var(--bg4);border:1px solid var(--border);color:var(--text);border-radius:var(--r);padding:3px 8px;font-size:13px" onchange="updateFeatureStatus(${f.id},this.value)">
+          <option value="planned" ${f.status==='planned'?'selected':''}>Planned</option>
+          <option value="in-progress" ${f.status==='in-progress'?'selected':''}>In Progress</option>
+          <option value="done" ${f.status==='done'?'selected':''}>Done</option>
+        </select>
+      </td>
+      <td style="display:flex;gap:4px">
+        <button class="admin-action-btn danger" onclick="deleteFeature(${f.id})">Delete</button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function switchAdminTab(btn, tabId) {
+  document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('.admin-sub-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+}
+
+function promoteUser(id) {
+  const u = state.users.find(x=>x.id===id);
+  u.role = u.role==='mod' ? 'member' : 'mod';
+  renderAdmin();
+  showNotif(u.role==='mod' ? u.callsign+' promoted to Mod' : u.callsign+' demoted to Member');
+}
+
+function toggleUserStatus(id) {
+  const u = state.users.find(x=>x.id===id);
+  u.status = u.status==='active' ? 'suspended' : 'active';
+  renderAdmin();
+  showNotif(u.callsign + (u.status==='active'?' unsuspended':' suspended'));
+}
+
+function deleteUser(id) {
+  if (!confirm('Delete this user?')) return;
+  state.users = state.users.filter(u=>u.id!==id);
+  renderAdmin();
+  renderPeople();
+  showNotif('User deleted.');
+}
+
+function editUser(id) {
+  const u = state.users.find(x=>x.id===id);
+  openModalWithContent('Edit User — ' + u.callsign, `
+    <div class="form-group"><label class="form-label">Callsign</label><input class="form-input" id="eu-callsign" value="${u.callsign}"></div>
+    <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="eu-email" value="${u.email}"></div>
+    <div class="form-group"><label class="form-label">Country</label><input class="form-input" id="eu-country" value="${u.country}"></div>
+    <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="eu-bio">${u.bio||''}</textarea></div>
+    <div class="form-group"><label class="form-label">Role</label>
+      <select class="form-select" id="eu-role">
+        <option value="member" ${u.role==='member'?'selected':''}>Member</option>
+        <option value="mod" ${u.role==='mod'?'selected':''}>Moderator</option>
+        <option value="admin" ${u.role==='admin'?'selected':''}>Admin</option>
+      </select>
+    </div>
+    <button class="btn btn-green" style="width:100%" onclick="saveEditUser(${id})">Save Changes</button>
+  `);
+}
+
+function saveEditUser(id) {
+  const u = state.users.find(x=>x.id===id);
+  u.callsign = document.getElementById('eu-callsign').value;
+  u.email = document.getElementById('eu-email').value;
+  u.country = document.getElementById('eu-country').value;
+  u.bio = document.getElementById('eu-bio').value;
+  u.role = document.getElementById('eu-role').value;
+  u.initials = u.callsign.slice(0,2).toUpperCase();
+  closeModal();
+  renderAdmin();
+  showNotif('User updated!');
+}
+
+function deleteLocation(id) {
+  if (!confirm('Remove this location?')) return;
+  state.locations = state.locations.filter(l=>l.id!==id);
+  renderAdmin();
+  showNotif('Location removed.');
+}
+
+function deleteEvent(id) {
+  if (!confirm('Delete this event?')) return;
+  state.events = state.events.filter(e=>e.id!==id);
+  renderAdmin();
+  showNotif('Event deleted.');
+}
+
+function deleteFeature(id) {
+  state.features = state.features.filter(f=>f.id!==id);
+  renderAdmin();
+  showNotif('Feature request deleted.');
+}
+
+function updateFeatureStatus(id, status) {
+  const f = state.features.find(x=>x.id===id);
+  f.status = status;
+  showNotif('Status updated to: ' + status);
+}
+
+// ============================================================
+// AUTH
+// ============================================================
+function switchAuthTab(tab) {
+  document.getElementById('auth-login').style.display = tab==='login'?'block':'none';
+  document.getElementById('auth-register').style.display = tab==='register'?'block':'none';
+  document.getElementById('tab-login-btn').classList.toggle('active', tab==='login');
+  document.getElementById('tab-register-btn').classList.toggle('active', tab==='register');
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  if (!email) { showNotif('Enter your email'); return; }
+  const user = state.users.find(u => u.email === email && u.password === password);
+  if (user) {
+    if (user.status === 'suspended') { showNotif('Account suspended. Contact admin.'); return; }
+    loginUser(user);
+  } else {
+    showNotif('Invalid credentials');
+  }
+}
+
+function doRegister() {
+  const callsign = document.getElementById('reg-callsign').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const country = document.getElementById('reg-country').value;
+  if (!callsign||!email||!password) { showNotif('Fill in all fields'); return; }
+  if (password.length < 6) { showNotif('Password too short (min 6)'); return; }
+  if (state.users.find(u=>u.email===email)) { showNotif('Email already registered'); return; }
+  const newUser = {
+    id: Date.now(), callsign, email, password, country, role:'member',
+    status:'active', joined: new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}),
+    games:0, bio:'', initials: callsign.slice(0,2).toUpperCase()
+  };
+  state.users.push(newUser);
+  document.getElementById('stat-profiles').textContent = state.users.length;
+  state.activity.unshift({ text: callsign+' just joined Airsoft World Wide!', time:'Just now', initials: newUser.initials });
+  loginUser(newUser);
+}
+
+function loginUser(user) {
+  state.user = user;
+  updateAuthUI();
+  navigate('feed');
+  showNotif('Welcome back, ' + user.callsign + '!');
+}
+
+function logout() {
+  state.user = null;
+  updateAuthUI();
+  navigate('feed');
+  showNotif('Logged out.');
+}
+
+function updateAuthUI() {
+  const nr = document.getElementById('nav-right');
+  if (state.user) {
+    nr.innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="navigate('profile')">🪖 ${state.user.callsign}</button>
+      ${state.user.role==='admin' ? `<button class="btn btn-outline btn-sm" onclick="navigate('admin')">⚙️ Admin</button>` : ''}
+      <button class="btn btn-ghost btn-sm" onclick="logout()">Log out</button>
+    `;
+    document.getElementById('admin-sidebar-section').style.display = state.user.role==='admin' ? 'block' : 'none';
+  } else {
+    nr.innerHTML = `
+      <button class="btn btn-ghost btn-sm" onclick="navigate('auth')">Log in</button>
+      <button class="btn btn-green btn-sm" onclick="navigate('auth')">Join</button>
+    `;
+    document.getElementById('admin-sidebar-section').style.display = 'none';
+  }
+}
+
+// ============================================================
+// MODALS
+// ============================================================
+function openModal(type) {
+  let title = '', content = '';
+  if (type === 'add-player') {
+    title = 'Add Player';
+    content = `
+      <div class="form-group"><label class="form-label">Callsign</label><input class="form-input" id="np-callsign" placeholder="Callsign"></div>
+      <div class="form-group"><label class="form-label">Email</label><input class="form-input" id="np-email" placeholder="Email"></div>
+      <div class="form-group"><label class="form-label">Country</label><select class="form-select" id="np-country"><option>United Kingdom</option><option>United States</option><option>Australia</option><option>Germany</option><option>Other</option></select></div>
+      <div class="form-group"><label class="form-label">Role</label><select class="form-select" id="np-role"><option value="member">Member</option><option value="mod">Moderator</option><option value="admin">Admin</option></select></div>
+      <button class="btn btn-green" style="width:100%" onclick="addPlayer()">Add Player</button>
+    `;
+  } else if (type === 'add-location') {
+    title = 'Add Location';
+    content = `
+      <div class="form-group"><label class="form-label">Site Name</label><input class="form-input" id="nl-name" placeholder="Site name"></div>
+      <div class="form-group"><label class="form-label">Type</label><select class="form-select" id="nl-type"><option>Woodland</option><option>CQB</option><option>CQC</option><option>Milsim</option><option>Mixed</option></select></div>
+      <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="nl-loc" placeholder="Town, County"></div>
+      <div class="form-group"><label class="form-label">Tags (comma separated)</label><input class="form-input" id="nl-tags" placeholder="Woodland, Hire Available"></div>
+      <button class="btn btn-green" style="width:100%" onclick="addLocation()">Add Location</button>
+    `;
+  } else if (type === 'add-event') {
+    title = 'Add Event';
+    content = `
+      <div class="form-group"><label class="form-label">Event Title</label><input class="form-input" id="ne-title" placeholder="Event name"></div>
+      <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="ne-loc" placeholder="Town/Venue"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="ne-date" type="date"></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="ne-desc" placeholder="Tell us about the event..."></textarea></div>
+      <button class="btn btn-green" style="width:100%" onclick="addEvent()">Add Event</button>
+    `;
+  } else if (type === 'add-gameday') {
+    title = 'Log Game Day';
+    content = `
+      <div class="form-group"><label class="form-label">Site</label><input class="form-input" id="ng-site" placeholder="Site name"></div>
+      <div class="form-group"><label class="form-label">Location</label><input class="form-input" id="ng-loc" placeholder="Town, County"></div>
+      <div class="form-group"><label class="form-label">Date</label><input class="form-input" id="ng-date" type="date"></div>
+      <button class="btn btn-green" style="width:100%" onclick="addGameDay()">Log Game</button>
+    `;
+  } else if (type === 'add-loadout') {
+    title = 'New Loadout';
+    content = `
+      <div class="form-group"><label class="form-label">Loadout Name</label><input class="form-input" id="nl2-name" placeholder="e.g. CQB Skirmish"></div>
+      <div class="form-group"><label class="form-label">Primary Weapon</label><input class="form-input" id="nl2-primary" placeholder="e.g. TM HK45"></div>
+      <div class="form-group"><label class="form-label">Clothing/Camo</label><input class="form-input" id="nl2-camo" placeholder="e.g. Multicam Black"></div>
+      <div class="form-group"><label class="form-label">Headgear</label><input class="form-input" id="nl2-head" placeholder="e.g. Fast Helmet"></div>
+      <div class="form-group"><label class="form-label">Other Items (comma separated)</label><input class="form-input" id="nl2-other" placeholder="Plate Carrier, Torch..."></div>
+      <button class="btn btn-green" style="width:100%" onclick="addLoadout()">Save Loadout</button>
+    `;
+  } else if (type === 'edit-profile') {
+    const u = state.user;
+    title = 'Edit Profile';
+    content = `
+      <div class="form-group"><label class="form-label">Callsign</label><input class="form-input" id="ep-callsign" value="${u.callsign}"></div>
+      <div class="form-group"><label class="form-label">Bio</label><textarea class="form-textarea" id="ep-bio">${u.bio||''}</textarea></div>
+      <div class="form-group"><label class="form-label">Country</label><input class="form-input" id="ep-country" value="${u.country||''}"></div>
+      <button class="btn btn-green" style="width:100%" onclick="saveProfile()">Save Profile</button>
+    `;
+  } else if (type === 'add-feature') {
+    title = 'Request a Feature';
+    content = `
+      <div class="form-group"><label class="form-label">Feature Title</label><input class="form-input" id="nf-title" placeholder="Describe your feature..."></div>
+      <div class="form-group"><label class="form-label">Details</label><textarea class="form-textarea" id="nf-detail" placeholder="More context..."></textarea></div>
+      <button class="btn btn-green" style="width:100%" onclick="addFeatureRequest()">Submit Request</button>
+    `;
+  }
+  openModalWithContent(title, content);
+}
+
+function openModalWithContent(title, content) {
+  document.getElementById('modal-box').innerHTML = `
+    <div class="modal-header">
+      <div class="modal-title">${title}</div>
+      <button class="modal-close" onclick="closeModal()">×</button>
+    </div>
+    <div class="modal-body">${content}</div>
+  `;
+  document.getElementById('modal-overlay').classList.remove('hidden');
+}
+
+function closeModal() {
+  document.getElementById('modal-overlay').classList.add('hidden');
+}
+
+function closeModalOnBg(e) {
+  if (e.target === document.getElementById('modal-overlay')) closeModal();
+}
+
+// Modal actions
+function addPlayer() {
+  const c = document.getElementById('np-callsign').value.trim();
+  const e = document.getElementById('np-email').value.trim();
+  if (!c||!e) { showNotif('Fill in callsign and email'); return; }
+  state.users.push({ id:Date.now(), callsign:c, email:e, password:'airsoft123', country:document.getElementById('np-country').value, role:document.getElementById('np-role').value, status:'active', joined:new Date().toLocaleDateString('en-GB',{day:'2-digit',month:'short',year:'numeric'}), games:0, bio:'', initials:c.slice(0,2).toUpperCase() });
+  closeModal(); renderAdmin(); renderPeople();
+  document.getElementById('stat-profiles').textContent = state.users.length;
+  showNotif('Player added!');
+}
+
+function addLocation() {
+  const n = document.getElementById('nl-name').value.trim();
+  if (!n) { showNotif('Enter a site name'); return; }
+  const tags = document.getElementById('nl-tags').value.split(',').map(t=>t.trim()).filter(Boolean);
+  state.locations.push({ id:Date.now(), name:n, type:document.getElementById('nl-type').value, loc:document.getElementById('nl-loc').value, emoji:'📍', tags });
+  closeModal(); renderLocations(); if(state.view==='admin') renderAdmin();
+  showNotif('Location added!');
+}
+
+function addEvent() {
+  const t = document.getElementById('ne-title').value.trim();
+  if (!t) { showNotif('Enter an event title'); return; }
+  state.events.unshift({ id:Date.now(), title:t, loc:document.getElementById('ne-loc').value, date:document.getElementById('ne-date').value, desc:document.getElementById('ne-desc').value, author:state.user?.callsign||'Admin', posted:'Today' });
+  closeModal(); if(state.view==='events') renderEvents(); if(state.view==='admin') renderAdmin();
+  showNotif('Event added!');
+}
+
+function addGameDay() {
+  const s = document.getElementById('ng-site').value.trim();
+  const d = document.getElementById('ng-date').value;
+  if (!s||!d) { showNotif('Fill in all fields'); return; }
+  const dt = new Date(d);
+  const months = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const dows = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+  state.gamedays.push({ id:Date.now(), date:dt.getDate()+' '+months[dt.getMonth()], month:months[dt.getMonth()], dow:dows[dt.getDay()], year:dt.getFullYear(), site:s, location:document.getElementById('ng-loc').value, players:[state.user?.initials?.slice(0,2)||'?'], status:'Upcoming' });
+  state.activity.unshift({ text:(state.user?.callsign||'Someone')+' added a new game day at '+s, time:'Just now', initials:state.user?.initials||'??' });
+  closeModal(); renderGameDiary(); renderFeed(); renderActivity();
+  showNotif('Game logged!');
+}
+
+function addLoadout() {
+  const n = document.getElementById('nl2-name').value.trim();
+  if (!n) { showNotif('Enter a loadout name'); return; }
+  const items = [
+    document.getElementById('nl2-primary').value,
+    document.getElementById('nl2-camo').value,
+    document.getElementById('nl2-head').value,
+    ...document.getElementById('nl2-other').value.split(',').map(t=>t.trim()),
+  ].filter(Boolean);
+  state.loadouts.push({ id:Date.now(), owner:state.user.id, name:n, items });
+  closeModal(); renderLoadouts();
+  showNotif('Loadout saved!');
+}
+
+function saveProfile() {
+  state.user.callsign = document.getElementById('ep-callsign').value.trim()||state.user.callsign;
+  state.user.bio = document.getElementById('ep-bio').value.trim();
+  state.user.country = document.getElementById('ep-country').value.trim();
+  state.user.initials = state.user.callsign.slice(0,2).toUpperCase();
+  const u = state.users.find(x=>x.id===state.user.id);
+  Object.assign(u, { callsign:state.user.callsign, bio:state.user.bio, country:state.user.country, initials:state.user.initials });
+  closeModal(); renderProfile(); updateAuthUI();
+  showNotif('Profile updated!');
+}
+
+function addFeatureRequest() {
+  const t = document.getElementById('nf-title').value.trim();
+  if (!t) { showNotif('Enter a feature description'); return; }
+  state.features.unshift({ id:Date.now(), title:t, submitter:state.user?.callsign||'Anonymous', votes:1, status:'planned', votedBy:[state.user?.id] });
+  state.activity.unshift({ text:(state.user?.callsign||'Someone')+' submitted a feature request: "'+t.slice(0,40)+'"', time:'Just now', initials:state.user?.initials||'??' });
+  closeModal(); renderFeatures(); renderActivity();
+  showNotif('Feature requested!');
+}
+
+// ============================================================
+// UTILS
+// ============================================================
+function showNotif(msg) {
+  const n = document.getElementById('notif-bar');
+  n.textContent = msg;
+  n.classList.add('show');
+  clearTimeout(n._t);
+  n._t = setTimeout(()=>n.classList.remove('show'), 3000);
+}
+
+function escHtml(str) {
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+// ============================================================
+// INIT
+// ============================================================
+renderFeed();
+renderActivity();
+</script>
+</body>
+</html>
